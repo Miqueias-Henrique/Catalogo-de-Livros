@@ -86,21 +86,43 @@ public class CatalogoLivrosApp {
         System.out.print("Sua escolha: ");
     }
 
+    // Dentro da classe 'public class CatalogoLivrosApp'
+
+    // MÉTODO ATUALIZADO com validação de campos em branco
     private static void inserirLivro(InterfaceArvore catalogo, Scanner scanner) {
         try {
             System.out.println("\n--- Inserir Novo Livro ---");
             System.out.print("Digite o ID (numero): ");
             int id = scanner.nextInt();
-            scanner.nextLine(); // Consumir nova linha
-            System.out.print("Digite o Titulo: ");
-            String titulo = scanner.nextLine();
-            System.out.print("Digite o Autor: ");
-            String autor = scanner.nextLine();
+            scanner.nextLine(); // Consumir a quebra de linha do nextInt()
+
+            String titulo;
+            // Loop para garantir que o título não seja vazio
+            do {
+                System.out.print("Digite o Titulo: ");
+                titulo = scanner.nextLine();
+                if (titulo.trim().isEmpty()) {
+                    System.out.println(">>> ERRO: O titulo nao pode estar em branco. Por favor, tente novamente.");
+                }
+            } while (titulo.trim().isEmpty());
+
+            String autor;
+            // Loop para garantir que o autor não seja vazio
+            do {
+                System.out.print("Digite o Autor: ");
+                autor = scanner.nextLine();
+                if (autor.trim().isEmpty()) {
+                    System.out.println(">>> ERRO: O autor nao pode estar em branco. Por favor, tente novamente.");
+                }
+            } while (autor.trim().isEmpty());
+
+            // Somente cria e insere o livro se todas as entradas forem válidas
             catalogo.inserir(new Livro(id, titulo, autor));
             System.out.println(">>> Livro '" + titulo + "' inserido com sucesso!");
+
         } catch (InputMismatchException e) {
             System.out.println(">>> ERRO: O ID deve ser um numero. Operacao cancelada.");
-            scanner.nextLine(); // Limpar buffer em caso de erro
+            scanner.nextLine(); // Limpar buffer em caso de erro de digitação do ID
         }
     }
 
