@@ -31,6 +31,7 @@ public class CatalogoLivrosApp {
                     case 4: listarLivros(catalogo, scanner); break;
                     case 5: carregarDeArquivo(catalogo, NOME_ARQUIVO); break;
                     case 6: exibirEstatisticas(catalogo); break;
+                    case 7: modificarLivro(catalogo, scanner); break; // NOVA OPÇÃO
                     case 0: salvarEFechar(catalogo, NOME_ARQUIVO); break;
                     default: System.out.println(">>> Opcao invalida. Tente novamente."); break;
                 }
@@ -81,48 +82,26 @@ public class CatalogoLivrosApp {
         System.out.println(" 4. Listar livros (diferentes percursos)  ");
         System.out.println(" 5. Carregar catalogo do arquivo          ");
         System.out.println(" 6. Exibir Estatisticas da Arvore         ");
+        System.out.println(" 7. Modificar um Livro                    "); // NOVA OPÇÃO
         System.out.println(" 0. Salvar Alteracoes e Sair              ");
-
         System.out.print("Sua escolha: ");
     }
 
-    // Dentro da classe 'public class CatalogoLivrosApp'
-
-    // MÉTODO ATUALIZADO com validação de campos em branco
     private static void inserirLivro(InterfaceArvore catalogo, Scanner scanner) {
         try {
             System.out.println("\n--- Inserir Novo Livro ---");
             System.out.print("Digite o ID (numero): ");
             int id = scanner.nextInt();
-            scanner.nextLine(); // Consumir a quebra de linha do nextInt()
-
-            String titulo;
-            // Loop para garantir que o título não seja vazio
-            do {
-                System.out.print("Digite o Titulo: ");
-                titulo = scanner.nextLine();
-                if (titulo.trim().isEmpty()) {
-                    System.out.println(">>> ERRO: O titulo nao pode estar em branco. Por favor, tente novamente.");
-                }
-            } while (titulo.trim().isEmpty());
-
-            String autor;
-            // Loop para garantir que o autor não seja vazio
-            do {
-                System.out.print("Digite o Autor: ");
-                autor = scanner.nextLine();
-                if (autor.trim().isEmpty()) {
-                    System.out.println(">>> ERRO: O autor nao pode estar em branco. Por favor, tente novamente.");
-                }
-            } while (autor.trim().isEmpty());
-
-            // Somente cria e insere o livro se todas as entradas forem válidas
+            scanner.nextLine(); // Consumir nova linha
+            System.out.print("Digite o Titulo: ");
+            String titulo = scanner.nextLine();
+            System.out.print("Digite o Autor: ");
+            String autor = scanner.nextLine();
             catalogo.inserir(new Livro(id, titulo, autor));
             System.out.println(">>> Livro '" + titulo + "' inserido com sucesso!");
-
         } catch (InputMismatchException e) {
             System.out.println(">>> ERRO: O ID deve ser um numero. Operacao cancelada.");
-            scanner.nextLine(); // Limpar buffer em caso de erro de digitação do ID
+            scanner.nextLine(); // Limpar buffer em caso de erro
         }
     }
 
@@ -221,6 +200,69 @@ public class CatalogoLivrosApp {
             System.out.println("\n>>> ERRO ao salvar o arquivo: " + e.getMessage());
         }
     }
+
+    private static void modificarLivro(InterfaceArvore catalogo, Scanner scanner) {
+        System.out.println("\n--- Modificar Livro ---");
+        System.out.print("Digite o ID do livro que deseja modificar: ");
+        try {
+            int id = scanner.nextInt();
+            scanner.nextLine(); // Limpa o buffer
+
+            Livro livro = catalogo.buscar(id);
+
+            // Verifica se o livro foi encontrado
+            if (livro == null) {
+                System.out.println(">>> ERRO: Livro com ID " + id + " nao encontrado.");
+                return; // Encerra o método se não encontrar o livro
+            }
+
+            System.out.println("Livro encontrado: " + livro);
+            System.out.println("O que voce deseja modificar?");
+            System.out.println("1. Titulo");
+            System.out.println("2. Autor");
+            System.out.println("0. Cancelar");
+            System.out.print("Sua escolha: ");
+            int escolha = scanner.nextInt();
+            scanner.nextLine(); // Limpa o buffer
+
+            switch (escolha) {
+                case 1:
+                    System.out.print("Digite o NOVO Titulo: ");
+                    String novoTitulo = scanner.nextLine();
+                    if (novoTitulo.trim().isEmpty()) {
+                        System.out.println(">>> ERRO: O titulo nao pode estar em branco. Operacao cancelada.");
+                    } else {
+                        livro.titulo = novoTitulo; // Modifica o título diretamente no objeto
+                        System.out.println(">>> Titulo atualizado com sucesso!");
+                    }
+                    break;
+                case 2:
+                    System.out.print("Digite o NOVO Autor: ");
+                    String novoAutor = scanner.nextLine();
+                    if (novoAutor.trim().isEmpty()) {
+                        System.out.println(">>> ERRO: O autor nao pode estar em branco. Operacao cancelada.");
+                    } else {
+                        livro.autor = novoAutor; // Modifica o autor diretamente no objeto
+                        System.out.println(">>> Autor atualizado com sucesso!");
+                    }
+                    break;
+                case 0:
+                    System.out.println(">>> Operacao cancelada.");
+                    break;
+                default:
+                    System.out.println(">>> Opcao invalida.");
+                    break;
+            }
+
+            if (escolha == 1 || escolha == 2) {
+                System.out.println("Lembre-se de usar a opcao 'Salvar e Sair' para tornar a alteracao permanente no arquivo.");
+            }
+
+        } catch (InputMismatchException e) {
+            System.out.println(">>> ERRO: O ID e a escolha devem ser numeros.");
+            scanner.nextLine(); // Limpa o buffer
+        }
+    }
 }
 
 // Interface, Livro, No, BST, NoAVL, AVL (com as modificações necessárias)
@@ -248,6 +290,8 @@ class No {
     Livro livro; No esquerda; No direita;
     public No(Livro livro) { this.livro = livro; this.esquerda = null; this.direita = null; }
 }
+// Adicione este método dentro da classe 'public class CatalogoLivrosApp'
+
 
 class BST implements InterfaceArvore {
     private No raiz;
